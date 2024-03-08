@@ -51,6 +51,19 @@ allow-direct-references = true
 Homepage = "https://github.com/yezz123/pgqb"
 Funding = 'https://github.com/sponsors/yezz123'
 
+[project.optional-dependencies]
+lint = [
+    "pre-commit==3.6.2",
+    "mypy==1.8.0",
+    "ruff==0.3.1"
+]
+test = [
+    "pytest==8.1.0",
+    "pytest-asyncio == 0.23.5",
+    "pytest-cov==4.1.0",
+    "python-decouple",
+    "pytest-pretty==1.2.0"
+]
 
 [tool.hatch.version]
 path = "pgqb/__init__.py"
