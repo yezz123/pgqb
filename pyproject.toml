@@ -1,0 +1,115 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pgqb"
+description = "Typed Python PostgreSQL query builder using Pydantic"
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+authors = [
+    { name = "Yasser Tahiri", email = "hello@yezz.me" },
+]
+keywords = [
+    "PostgreSQL",
+    "Pydantic",
+    "Query",
+]
+
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 4 - Beta",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Framework :: Pydantic",
+    "Framework :: Pydantic :: 2",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "pydantic >=2.0.0,<2.6.3",
+    "pydantic-settings >=2.1.0",
+]
+
+dynamic = ["version"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[project.urls]
+Homepage = "https://github.com/yezz123/pgqb"
+Funding = 'https://github.com/sponsors/yezz123'
+
+
+[tool.hatch.version]
+path = "pgqb/__init__.py"
+
+
+[tool.ruff.lint]
+mccabe = { max-complexity = 14 }
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.lint.isort]
+known-third-party = ["pydantic", "typing_extensions"]
+
+[tool.ruff.lint.pyupgrade]
+keep-runtime-typing = true
+
+[tool.coverage.run]
+source = ["pgqb"]
+branch = true
+context = '${CONTEXT}'
+
+[tool.coverage.paths]
+source = [
+    'pgqb/',
+    '/Users/runner/work/pgqb/pgqb/pgqb/',
+    'D:\a\pgqb\pgqb\pgqb',
+]
+
+[tool.coverage.report]
+precision = 2
+exclude_lines = [
+    'pragma: no cover',
+    'raise NotImplementedError',
+    'if TYPE_CHECKING:',
+    '@overload',
+]
+
+[tool.mypy]
+strict = true
+plugins = 'pydantic.mypy'
+
+
+[tool.pytest.ini_options]
+testpaths = 'tests'
+log_cli = "1"
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format= "%Y-%m-%d %H:%M:%S"
+asyncio_mode= "auto"
+filterwarnings = [
+    'error',
+    'ignore::DeprecationWarning',
+]
