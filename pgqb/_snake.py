@@ -32,7 +32,7 @@ def get_words(string: str) -> list[str]:
     return words
 
 
-def _split_words_on_regex(words: list[str], regex: Union[re.Pattern, str]) -> list[str]:
+def _split_words_on_regex(words: list[str], regex: Union[re.Pattern, str]) -> list[str]:  # type: ignore
     """
     Split words on a regex.
 
