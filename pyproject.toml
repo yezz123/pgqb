@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "pgqb"
 description = "Typed Python PostgreSQL query builder using Pydantic"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = "MIT"
 authors = [
     { name = "Yasser Tahiri", email = "hello@yezz.me" },
@@ -83,7 +83,7 @@ select = [
 "__init__.py" = ["F401"]
 
 [tool.ruff.lint.isort]
-known-third-party = ["pydantic", "typing_extensions"]
+known-third-party = ["pydantic"]
 
 [tool.ruff.lint.pyupgrade]
 keep-runtime-typing = true
