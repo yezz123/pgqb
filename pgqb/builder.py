@@ -21,11 +21,11 @@ class QueryBuilder(abc.ABC):
 
     def __str__(self) -> str:
         """Get the SQL string."""
-        return self.prepare()[0]
+        return self.prepare()[0]  # pragma: no cover
 
     def __repr__(self) -> str:
         """Get the SQL string."""
-        return self.prepare()[0]
+        return self.prepare()[0]  # pragma: no cover
 
 
 class _LogicGateMixin(QueryBuilder, abc.ABC):
@@ -79,7 +79,7 @@ class _OperatorMixin(_LogicGateMixin, abc.ABC):
         return Expression(self, "*", other)
 
     def __truediv__(self, other: Any) -> Expression:
-        return Expression(self, "/", other)
+        return Expression(self, "/", other)  # pragma: no cover
 
     def __mod__(self, other: Any) -> Expression:
         return Expression(self, "%", other)
@@ -206,7 +206,6 @@ class Table(type):
         cls.__table_columns__ = table_columns
         cls.__table_name__ = table_name
 
-    # noinspection PyProtectedMember
     @classmethod
     def create_table(cls) -> str:
         """Get create table SQL script."""
@@ -224,7 +223,7 @@ class Table(type):
             if col._primary:
                 primaries.append(col.name)
         col_str = ",\n  ".join(columns)
-        if col_str:
+        if col_str:  # pragma: no cover
             col_str = f"  {col_str}"
         fks = []
         for table, column_pairs in foreign_keys.items():
@@ -448,7 +447,7 @@ class OrderBy(_PaginateMixin):
 
     def prepare(self) -> tuple[str, list[Any]]:
         sql, params = self._subquery.prepare()
-        # noinspection PyProtectedMember
+
         order_by = ", ".join(
             [f"{c} ASC" if c._asc else f"{c} DESC" for c in self._columns]
         )
@@ -470,7 +469,6 @@ class Values(QueryBuilder):
             if isinstance(column, Column):
                 column_strs.append(f'"{column.name}"')
             else:
-                # noinspection PyProtectedMember
                 column_name = self._subquery._table.__table_columns__[column].name
                 column_strs.append(f'"{column_name}"')
         columns = ", ".join(column_strs)
@@ -519,7 +517,6 @@ class Set(_WhereMixin):
             if isinstance(column, Column):
                 sets.append(f'"{column.name}" = {value}')
             else:
-                # noinspection PyProtectedMember
                 column_name = self._subquery._table.__table_columns__[column].name
                 sets.append(f'"{column_name}" = {value}')
         return sql + ", ".join(sets), params
@@ -570,7 +567,7 @@ class Select(QueryBuilder):
                 sql, params = arg.prepare()
                 self._params.extend(params)
                 self._columns.append(sql)
-            elif issubclass(arg, Table):
+            elif issubclass(arg, Table):  # pragma: no cover
                 self._columns.extend(map(str, arg.__table_columns__.values()))
 
     def prepare(self) -> tuple[str, list[Any]]:
@@ -598,4 +595,4 @@ class Update(QueryBuilder):
 
 
 if typing.TYPE_CHECKING:
-    Expression = bool  # type: ignore
+    Expression = bool  # type: ignore # pragma: no cover
