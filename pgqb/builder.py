@@ -29,59 +29,116 @@ class QueryBuilder(abc.ABC):
 
 
 class _LogicGateMixin(QueryBuilder, abc.ABC):
+    """
+    Logic gate mixin.
+
+    This mixin is used to add logic gates to the query builder.
+
+    Args:
+        QueryBuilder: The query builder to add logic gates to.
+        abc.ABC: The abstract base class.
+    """
+
     def and_(self, evaluation: Expression | LogicGate) -> LogicGate:
-        """And."""
+        """
+        And.
+
+        Args:
+            evaluation: The evaluation to add to the query.
+
+        Returns:
+            The query builder with the evaluation added.
+        """
         return LogicGate(self, "AND", evaluation)
 
     def or_(self, evaluation: Expression | LogicGate) -> LogicGate:
-        """Or."""
+        """Or.
+        Args:
+            evaluation: The evaluation to add to the query.
+
+        Returns:
+            The query builder with the evaluation added.
+        """
         return LogicGate(self, "OR", evaluation)
 
     def and_not(self, evaluation: Expression | LogicGate) -> LogicGate:
-        """And not."""
+        """And not.
+        Args:
+            evaluation: The evaluation to add to the query.
+
+        Returns:
+            The query builder with the evaluation added.
+        """
         return LogicGate(self, "AND NOT", evaluation)
 
     def or_not(self, evaluation: Expression | LogicGate) -> LogicGate:
-        """Or not."""
+        """Or not.
+        Args:
+            evaluation: The evaluation to add to the query.
+
+        Returns:
+            The query builder with the evaluation added.
+        """
         return LogicGate(self, "OR NOT", evaluation)
 
 
 class _OperatorMixin(_LogicGateMixin, abc.ABC):
+    """
+    Operator mixin.
+
+    Args:
+        _LogicGateMixin: The logic gate mixin to add operators to.
+        abc.ABC: The abstract base class.
+    Returns:
+        The query builder with the evaluation added.
+    """
+
     def __gt__(self, other: Any) -> Expression:
+        """Greater than operator."""
         return Expression(self, ">", other)
 
     def __ge__(self, other: Any) -> Expression:
+        """Greater than or equal to operator."""
         return Expression(self, ">=", other)
 
     def __lt__(self, other: Any) -> Expression:
+        """Less than operator."""
         return Expression(self, "<", other)
 
     def __le__(self, other: Any) -> Expression:
+        """Less than or equal to operator."""
         return Expression(self, "<=", other)
 
     def __eq__(self, other: object) -> Expression:  # type: ignore
+        """Equality operator."""
         if other is None or other is True or other is False:
             return Expression(self, "IS", other)
         return Expression(self, "=", other)
 
     def __ne__(self, other: object) -> Expression:  # type: ignore
+        """Inequality operator."""
         if other is None or other is True or other is False:
             return Expression(self, "IS NOT", other)
         return Expression(self, "!=", other)
 
     def __add__(self, other: Any) -> Expression:
+        """Addition operator."""
         return Expression(self, "+", other)
 
     def __sub__(self, other: Any) -> Expression:
+        """Subtraction operator."""
         return Expression(self, "-", other)
 
     def __mul__(self, other: Any) -> Expression:
+        """Multiplication operator."""
         return Expression(self, "*", other)
 
     def __truediv__(self, other: Any) -> Expression:
+        """Division operator."""
         return Expression(self, "/", other)  # pragma: no cover
 
     def __mod__(self, other: Any) -> Expression:
+        """Modulo operator."""
         return Expression(self, "%", other)
 
     def is_(self, other: Any) -> Expression:
@@ -98,13 +155,23 @@ class _OperatorMixin(_LogicGateMixin, abc.ABC):
 
 
 class As(QueryBuilder):
-    """As alias."""
+    """As alias.
+
+    Args:
+        sub_query: The sub query to alias.
+        alias: The alias to use.
+
+    Returns:
+        The query builder with the evaluation added.
+    """
 
     def __init__(self, sub_query: Column | Expression, alias: str) -> None:
+        """As alias."""
         self._sub_query = sub_query
         self._alias = alias
 
     def prepare(self) -> tuple[str, list[Any]]:
+        """Get column as SQL."""
         if isinstance(self._sub_query, Column):
             return f"{self._sub_query} AS {self._alias}", []
         sql, params = self._sub_query.prepare()
@@ -126,6 +193,18 @@ class Column(_OperatorMixin):
         primary: bool = False,
         unique: bool = False,
     ) -> None:
+        """Query building class for SQL.
+
+        Args:
+            sql_type: The SQL type for this column.
+            check: The check constraint for this column.
+            default: The default value for this column.
+            foreign_key: The foreign key for this column.
+            index: Whether to create an index for this column.
+            null: Whether this column is nullable.
+            primary: Whether this column is a primary key.
+            unique: Whether this column is unique.
+        """
         self.name = ""
         self.table = ""
         self._asc = True
@@ -139,12 +218,15 @@ class Column(_OperatorMixin):
         self._sql_type = sql_type
 
     def __str__(self) -> str:
+        """Get the string representation of this column."""
         return f"{self.table}.{self.name}"
 
     def __hash__(self) -> int:
+        """Get the hash of this column."""
         return hash(str(self))
 
     def _create(self) -> str:
+        """Get column create SQL."""
         null = " NOT NULL" if not self._null and not self._primary else ""
         unique = " UNIQUE" if self._unique else ""
         check = f" CHECK ({self._check})" if self._check else ""
@@ -179,6 +261,7 @@ class Column(_OperatorMixin):
         return self.column(False)
 
     def column(self, argument: bool) -> Column:
+        """Get this column with argument."""
         col = Column()
         col.name = self.name
         col.table = self.table
@@ -193,6 +276,7 @@ class Table(type):
     __table_columns__: dict[str, Column] = {}
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
+        """Initialize the table."""
         super().__init_subclass__(**kwargs)
         table_name = f'"{snake(cls.__name__)}"'
         table_columns = {}
@@ -250,6 +334,8 @@ class Table(type):
 
 
 class _JoinMixin(QueryBuilder, abc.ABC):
+    """Mixin for join expressions."""
+
     def join(self, table: Type[Table]) -> Join:
         """Join expression."""
         return Join(self, table)
@@ -276,6 +362,8 @@ class _OffsetMixin(QueryBuilder, abc.ABC):
 
 
 class _PaginateMixin(_OffsetMixin, _LimitMixin, ABC):
+    """Paginate expression."""
+
     pass
 
 
@@ -301,11 +389,19 @@ class LogicGate(_LogicGateMixin, _OrderByMixin, _PaginateMixin):
     def __init__(
         self, subquery: _LogicGateMixin, gate: str, left_operand: Expression | LogicGate
     ) -> None:
+        """Represents a SQL `AND` expression.
+
+        Args:
+            subquery: The query to where.
+            gate: The gate to where.
+            left_operand: The left operand to where.
+        """
         self._subquery = subquery
         self._gate = gate
         self._left_operand = left_operand
 
     def prepare(self) -> tuple[str, list[Any]]:
+        """Get all params and the SQL string."""
         sql, params = self._subquery.prepare()
         eval_sql, eval_params = self._left_operand.prepare()
         if isinstance(self._left_operand, LogicGate):
@@ -322,6 +418,13 @@ class Expression(_OperatorMixin, _PaginateMixin):
         operator: str,
         right_operand: Any,
     ) -> None:
+        """Represent a SQL evaluation.
+
+        Args:
+            left_operand: The left operand.
+            operator: The operator.
+            right_operand: The right operand.
+        """
         self._params: list[Any] = []
         self._left_operand = left_operand
         other_str = "?"
@@ -359,10 +462,17 @@ class Join(QueryBuilder):
     def __init__(
         self, from_: From | Join | On | _JoinMixin, table: Type[Table]
     ) -> None:
+        """Join operator.
+
+        Args:
+            from_: The query to join.
+            table: The table to join.
+        """
         self._from = from_
         self._table = table
 
     def prepare(self) -> tuple[str, list[Any]]:
+        """Get all params and the SQL string."""
         sql, params = self._from.prepare()
         return f"{sql} JOIN {self._table.__table_name__}", params
 
@@ -375,6 +485,7 @@ class LeftJoin(Join):
     """Left join operator."""
 
     def prepare(self) -> tuple[str, list[Any]]:
+        """Get all params and the SQL string."""
         sql, params = self._from.prepare()
         return f"{sql} LEFT JOIN {self._table.__table_name__}", params
 
@@ -383,6 +494,7 @@ class RightJoin(Join):
     """Left join operator."""
 
     def prepare(self) -> tuple[str, list[Any]]:
+        """Get all params and the SQL string."""
         sql, params = self._from.prepare()
         return f"{sql} RIGHT JOIN {self._table.__table_name__}", params
 
@@ -391,10 +503,17 @@ class Limit(_OffsetMixin):
     """Limit operator."""
 
     def __init__(self, subquery: QueryBuilder, limit: int) -> None:
+        """Limit operator.
+
+        Args:
+            subquery: The query to limit.
+            limit: The limit to limit.
+        """
         self.subquery = subquery
         self.limit = limit
 
     def prepare(self) -> tuple[str, list[Any]]:
+        """Get all params and the SQL string."""
         sql, params = self.subquery.prepare()
         return f"{sql} LIMIT {self.limit}", params
 
@@ -403,10 +522,17 @@ class Offset(QueryBuilder):
     """Offset operator."""
 
     def __init__(self, subquery: QueryBuilder, offset: int) -> None:
+        """Offset operator.
+
+        Args:
+            subquery: The query to offset.
+            offset: The offset to offset.
+        """
         self.subquery = subquery
         self.offset = offset
 
     def prepare(self) -> tuple[str, list[Any]]:
+        """Get all params and the SQL string."""
         sql, params = self.subquery.prepare()
         return f"{sql} OFFSET {self.offset}", params
 
@@ -415,10 +541,17 @@ class On(_JoinMixin, _WhereMixin, _PaginateMixin):
     """On operator."""
 
     def __init__(self, join: Join, other: Expression) -> None:
+        """On operator.
+
+        Args:
+            join: The join to on.
+            other: The other expression to on.
+        """
         self._join = join
         self._other = other
 
     def prepare(self) -> tuple[str, list[Any]]:
+        """Get all params and the SQL string."""
         sql, params = self._join.prepare()
         eval_sql, eval_params = self._other.prepare()
         return f"{sql} ON {eval_sql}", params + eval_params
@@ -428,10 +561,17 @@ class From(_JoinMixin, _WhereMixin, _PaginateMixin):
     """From expression."""
 
     def __init__(self, select: Select, table: Type[Table]) -> None:
+        """From expression.
+
+        Args:
+            select: The query to from.
+            table: The table to from.
+        """
         self._select = select
         self._table = table
 
     def prepare(self) -> tuple[str, list[Any]]:
+        """Get all params and the SQL string."""
         sql, params = self._select.prepare()
         return f"{sql} FROM {self._table.__table_name__}", params
 
@@ -442,10 +582,17 @@ class OrderBy(_PaginateMixin):
     def __init__(
         self, subquery: Select | From | On | _OrderByMixin, *columns: Column
     ) -> None:
+        """Order by expression.
+
+        Args:
+            subquery: The query to order by.
+            columns: The columns to order by.
+        """
         self._subquery = subquery
         self._columns = columns
 
     def prepare(self) -> tuple[str, list[Any]]:
+        """Get all params and the SQL string."""
         sql, params = self._subquery.prepare()
 
         order_by = ", ".join(
@@ -458,10 +605,17 @@ class Values(QueryBuilder):
     """SQL `VALUES` expression."""
 
     def __init__(self, subquery: InsertInto, values: dict[Column | str, Any]) -> None:
+        """Values expression.
+
+        Args:
+            subquery: The query to values.
+            values: The values to values.
+        """
         self._subquery = subquery
         self._values = values
 
     def prepare(self) -> tuple[str, list[Any]]:
+        """Get all params and the SQL string."""
         sql, _ = self._subquery.prepare()
         values = ", ".join("?" for _ in range(len(self._values)))
         column_strs = []
@@ -483,6 +637,12 @@ class Where(_LogicGateMixin, _OrderByMixin, _PaginateMixin):
         subquery: Select | From | On | _WhereMixin,
         evaluation: Expression | LogicGate,
     ) -> None:
+        """Where expression.
+
+        Args:
+            subquery: The query to where.
+            evaluation: The evaluation to where.
+        """
         self._subquery = subquery
         sql, params = evaluation.prepare()
         self._eval_params = params
@@ -491,6 +651,7 @@ class Where(_LogicGateMixin, _OrderByMixin, _PaginateMixin):
         self._sql = sql
 
     def prepare(self) -> tuple[str, list[Any]]:
+        """Get all params and the SQL string."""
         sql, params = self._subquery.prepare()
         return f"{sql} WHERE {self._sql}", params + self._eval_params
 
@@ -499,10 +660,17 @@ class Set(_WhereMixin):
     """Set expression."""
 
     def __init__(self, subquery: Update, values: dict[Column | str, Any]) -> None:
+        """Set expression.
+
+        Args:
+            subquery: The query to set.
+            values: The values to set.
+        """
         self._subquery = subquery
         self._values = values
 
     def prepare(self) -> tuple[str, list[Any]]:
+        """Get all params and the SQL string."""
         sql, params = self._subquery.prepare()
         sql += " SET "
         sets = []
@@ -526,9 +694,15 @@ class InsertInto(QueryBuilder):
     """SQL `INSERT` query builder."""
 
     def __init__(self, table: Type[Table]) -> None:
+        """Insert query builder.
+
+        Args:
+            table: The table to insert into.
+        """
         self._table = table
 
     def prepare(self) -> tuple[str, list[Any]]:
+        """Get all params and the SQL string."""
         return f"INSERT INTO {self._table.__table_name__}", []
 
     def values(self, values: dict[Column | str, Any] | None = None) -> Values:
@@ -540,9 +714,15 @@ class Delete(_WhereMixin):
     """SQL `DELETE` query builder."""
 
     def __init__(self, table: Type[Table]) -> None:
+        """Delete query builder.
+
+        Args:
+            table: The table to delete from.
+        """
         self._table = table
 
     def prepare(self) -> tuple[str, list[Any]]:
+        """Get all params and the SQL string."""
         return f"DELETE FROM {self._table.__table_name__}", []  # noqa: S608
 
 
@@ -571,6 +751,7 @@ class Select(QueryBuilder):
                 self._columns.extend(map(str, arg.__table_columns__.values()))
 
     def prepare(self) -> tuple[str, list[Any]]:
+        """Get all params and the SQL string."""
         select = f"SELECT {', '.join(self._columns)}"
         return select, self._params
 
@@ -583,6 +764,11 @@ class Update(QueryBuilder):
     """SQL `UPDATE` query builder."""
 
     def __init__(self, table: Type[Table]) -> None:
+        """Update query builder.
+
+        Args:
+            table: The table to update.
+        """
         self._table = table
 
     def set(self, values: dict[Column | str, Any]) -> Set:
@@ -595,4 +781,5 @@ class Update(QueryBuilder):
 
 
 if typing.TYPE_CHECKING:
+    """Type hint for expressions."""
     Expression = bool  # type: ignore # pragma: no cover

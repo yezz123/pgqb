@@ -1,4 +1,4 @@
-""" "Typed Python PostgreSQL query builder using Pydantic"""
+"""Typed Python PostgreSQL query builder using Pydantic"""
 
 from __future__ import annotations
 
