@@ -47,6 +47,7 @@ class SQLType:
     """Base SQL type class."""
 
     def __str__(self) -> str:
+        """Get the string representation of this column."""
         return self.__class__.__name__
 
 
@@ -82,9 +83,15 @@ class CHAR(SQLType):
     """Fixed-length character string."""
 
     def __init__(self, fixed_length: int | None = None) -> None:
+        """Fixed-length character string.
+
+        Args:
+            fixed_length: The fixed length of the string.
+        """
         self._fixed_length = fixed_length
 
     def __str__(self) -> str:
+        """Get the string representation of this column."""
         return f"CHAR({self._fixed_length})" if self._fixed_length else "CHAR"
 
 
@@ -92,9 +99,15 @@ class VARCHAR(SQLType):
     """Variable-length character string."""
 
     def __init__(self, variable_length: int | None = None) -> None:
+        """Variable-length character string.
+
+        Args:
+            variable_length: The variable length of the string.
+        """
         self._variable_length = variable_length
 
     def __str__(self) -> str:
+        """Get the string representation of this column."""
         if self._variable_length:
             return f"VARCHAR({self._variable_length})"
         return "VARCHAR"
@@ -116,6 +129,7 @@ class DOUBLE(SQLType):
     """Double precision floating-point number (8 bytes)."""
 
     def __str__(self) -> str:
+        """Get the string representation of this column."""
         return "DOUBLE PRECISION"
 
 
@@ -131,10 +145,17 @@ class INTERVAL(SQLType):
     """Time span."""
 
     def __init__(self, fields: str | None = None, precision: int | None = None) -> None:
+        """Time span.
+
+        Args:
+            fields: The fields of the interval.
+            precision: The precision of the interval.
+        """
         self._fields = fields
         self._precision = precision
 
     def __str__(self) -> str:
+        """Get the string representation of this column."""
         fields = f" {self._fields}" if self._fields else ""
         precision = f"({self._precision})" if self._precision else ""
         return f"INTERVAL{fields}{precision}"
@@ -172,10 +193,17 @@ class NUMERIC(SQLType):
     """Exact numeric of selectable precision."""
 
     def __init__(self, precision: int | None = None, scale: int | None = None) -> None:
+        """Exact numeric of selectable precision.
+
+        Args:
+            precision: The precision of the numeric.
+            scale: The scale of the numeric.
+        """
         self._precision = precision
         self._scale = scale
 
     def __str__(self) -> str:
+        """Get the string representation of this column."""
         if self._precision and self._scale:
             args = f"({self._precision}, {self._scale})"
         elif self._precision:
@@ -236,10 +264,17 @@ class TIME(SQLType):
     def __init__(
         self, precision: int | None = None, *, with_time_zone: bool = False
     ) -> None:
+        """Time of day.
+
+        Args:
+            precision: The precision of the time.
+            with_time_zone: Whether to include the time zone.
+        """
         self._precision = precision
         self._with_time_zone = with_time_zone
 
     def __str__(self) -> str:
+        """Get the string representation of this column."""
         precision = f"({self._precision})" if self._precision else ""
         tz = " WITH TIME ZONE" if self._with_time_zone else ""
         return f"TIME{precision}{tz}"
@@ -251,10 +286,17 @@ class TIMESTAMP(SQLType):
     def __init__(
         self, precision: int | None = None, *, with_time_zone: bool = False
     ) -> None:
+        """Date and time.
+
+        Args:
+            precision: The precision of the timestamp.
+            with_time_zone: Whether to include the time zone.
+        """
         self._precision = precision
         self._with_time_zone = with_time_zone
 
     def __str__(self) -> str:
+        """Get the string representation of this column."""
         precision = f"({self._precision})" if self._precision else ""
         tz = " WITH TIME ZONE" if self._with_time_zone else ""
         return f"TIMESTAMP{precision}{tz}"
