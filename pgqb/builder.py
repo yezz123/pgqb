@@ -589,14 +589,14 @@ class OrderBy(_PaginateMixin):
             columns: The columns to order by.
         """
         self._subquery = subquery
-        self._columns = columns
+        self.columns = list(columns)
 
     def prepare(self) -> tuple[str, list[Any]]:
         """Get all params and the SQL string."""
         sql, params = self._subquery.prepare()
 
         order_by = ", ".join(
-            [f"{c} ASC" if c._asc else f"{c} DESC" for c in self._columns]
+            [f"{c} ASC" if c._asc else f"{c} DESC" for c in self.columns]
         )
         return f"{sql} ORDER BY {order_by}", params
 
@@ -612,21 +612,21 @@ class Values(QueryBuilder):
             values: The values to values.
         """
         self._subquery = subquery
-        self._values = values
+        self.values = values
 
     def prepare(self) -> tuple[str, list[Any]]:
         """Get all params and the SQL string."""
         sql, _ = self._subquery.prepare()
-        values = ", ".join("?" for _ in range(len(self._values)))
+        values = ", ".join("?" for _ in range(len(self.values)))
         column_strs = []
-        for column in self._values:
+        for column in self.values:
             if isinstance(column, Column):
                 column_strs.append(f'"{column.name}"')
             else:
                 column_name = self._subquery._table.__table_columns__[column].name
                 column_strs.append(f'"{column_name}"')
         columns = ", ".join(column_strs)
-        return f"{sql} ({columns}) VALUES ({values})", list(self._values.values())
+        return f"{sql} ({columns}) VALUES ({values})", list(self.values.values())
 
 
 class Where(_LogicGateMixin, _OrderByMixin, _PaginateMixin):
@@ -667,14 +667,14 @@ class Set(_WhereMixin):
             values: The values to set.
         """
         self._subquery = subquery
-        self._values = values
+        self.values = values
 
     def prepare(self) -> tuple[str, list[Any]]:
         """Get all params and the SQL string."""
         sql, params = self._subquery.prepare()
         sql += " SET "
         sets = []
-        for column, param in self._values.items():
+        for column, param in self.values.items():
             if isinstance(param, QueryBuilder):
                 sub_q, sub_q_params = param.prepare()
                 params.extend(sub_q_params)
