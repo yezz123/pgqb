@@ -2,14 +2,14 @@
 #    uv pip compile pyproject.toml -o requirements/pyproject.txt
 annotated-types==0.7.0
     # via pydantic
-pydantic==2.7.1
+pydantic==2.7.2
     # via pydantic-settings
-pydantic-core==2.18.2
+pydantic-core==2.18.3
     # via pydantic
-pydantic-settings==2.2.1
+pydantic-settings==2.3.1
 python-dotenv==1.0.1
     # via pydantic-settings
-typing-extensions==4.11.0
+typing-extensions==4.12.1
     # via
     #   pydantic
     #   pydantic-core
