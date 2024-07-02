@@ -1,0 +1,113 @@
+site_name: pgqb
+site_description: Typed Python PostgreSQL query builder using Pydantic
+site_url: https://pgqb.yezz.me/
+
+theme:
+  name: 'material'
+  palette:
+    - scheme: default
+      primary: amber
+      accent: orange
+      toggle:
+          icon: material/lightbulb
+          name: Switch to dark mode
+    - scheme: slate
+      primary: amber
+      accent: orange
+      toggle:
+          icon: material/lightbulb-outline
+          name: Switch to light mode
+  favicon: favicon.png
+  features:
+  - search.suggest
+  - search.highlight
+  - content.tabs.link
+  - navigation.indexes
+  - content.tooltips
+  - navigation.path
+  - content.code.annotate
+  - content.code.copy
+  - content.code.select
+  - navigation.tabs
+  icon:
+    repo: fontawesome/brands/github-alt
+    logo: fontawesome/solid/database
+  language: en
+repo_name: Yezz123/pgqb
+repo_url: https://github.com/yezz123/pgqb
+edit_uri: edit/main/docs/
+
+plugins:
+  - search: null
+  - social:
+      cards_layout_options:
+        background_color: "#FFDE59"
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            extensions:
+            - griffe_typingdoc
+            show_root_heading: true
+            show_if_no_docstring: true
+            inherited_members: true
+            members_order: source
+            separate_signature: true
+            unwrap_annotated: true
+            filters:
+            - '!^_'
+            heading_level: 3
+            merge_init_into_class: true
+            docstring_section_style: spacy
+            signature_crossrefs: true
+            allow_inspection: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+
+markdown_extensions:
+  - attr_list
+  - md_in_html
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - abbr
+  - admonition
+  - pymdownx.details
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+extra_javascript:
+    - js/termynal.js
+    - js/custom.js
+extra_css:
+    - css/termynal.css
+    - css/custom.css
+
+nav:
+  - About: index.md
+  - Reference - API:
+    - api/index.md
+    - api/builder.md
+  - Changelog: release.md
+
+extra:
+  generator: true
+  social:
+  - icon: fontawesome/brands/github-alt
+    link: https://github.com/yezz123/pgqb
+  - icon: fontawesome/brands/x-twitter
+    link: https://x.com/THyasser1
+  - icon: fontawesome/solid/globe
+    link: https://ormdantic.yezz.me
