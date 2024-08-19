@@ -41,7 +41,7 @@ pip install pgqb
 ## Project using
 
 ```py
-from pgqb import Column, Table, select
+from pgqb import Column, Table, and_, join, select
 
 
 class User(Table):
@@ -57,27 +57,30 @@ class Task(Table):
 
 
 sql, params = (
-    select(User)
-    .from_(User)
-    .join(Task)
-    .on(Task.user_id == User.id)
-    .where(User.id == 1)
-    .order_by(Task.value.desc())
+    select(
+        User.id,
+    )
+    .from_(User, join(Task).on(Task.user_id == User.id))
+    .where(User.id == 1, and_(Task.id == 1))
+    .order_by(
+        Task.value.desc(),
+    )
 ).prepare()
 
 expected = " ".join(
     [
-        'SELECT "user".id, "user".first, "user".last',
+        'SELECT "user".id',
         'FROM "user"',
         'JOIN "task" ON "task".user_id = "user".id',
         'WHERE "user".id = ?',
+        'AND "task".id = ?',
         'ORDER BY "task".value DESC',
     ]
 )
 
+print(sql == expected)
 
-print(sql==expected)
-# > True
+# >>> True
 ```
 
 ### Create Table
@@ -95,14 +98,14 @@ class User(Table):
 
 print(User.create_table())
 
-# > CREATE TABLE IF NOT EXISTS "user" (
-#  "id" UUID,
-#  "email" TEXT NOT NULL UNIQUE,
-#  "first" TEXT NOT NULL,
-#  "last" TEXT NOT NULL,
-#  "verified_at" TIMESTAMP WITH TIME ZONE NOT NULL,
-#  PRIMARY KEY (id)
-#);
+# CREATE TABLE IF NOT EXISTS "user" (
+#   "id" UUID,
+#   "email" TEXT NOT NULL UNIQUE,
+#   "first" TEXT NOT NULL,
+#   "last" TEXT NOT NULL,
+#   "verified_at" TIMESTAMP WITH TIME ZONE NOT NULL,
+#   PRIMARY KEY (id)
+# );
 # CREATE INDEX ON "user" (email);
 ```
 
