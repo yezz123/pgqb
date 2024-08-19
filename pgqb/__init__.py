@@ -1,9 +1,8 @@
-"""Typed Python PostgreSQL query builder using Pydantic"""
+"""A simple SQL query builder for PostgreSQL."""
 
 from __future__ import annotations
 
 __version__ = "0.1.0"
-
 
 __all__ = (
     "As",
@@ -82,6 +81,7 @@ from typing import Type
 
 from pgqb.builder import (
     As,
+    BooleanOperator,
     Column,
     Delete,
     Expression,
@@ -165,3 +165,43 @@ def select(*args: Column | Type[Table] | As) -> Select:
 def update(table: Type[Table]) -> Update:
     """Build an update query."""
     return Update(table)
+
+
+def join(table: Type[Table]) -> Join:
+    """Build a join query."""
+    return Join(table)
+
+
+def left_join(table: Type[Table]) -> Join:
+    """Build a left join query."""
+    return LeftJoin(table)
+
+
+def right_join(table: Type[Table]) -> Join:
+    """Build a right join query."""
+    return RightJoin(table)
+
+
+def on(evaluation: Expression, *evaluations: Expression | LogicGate) -> On:
+    """Build an "on" query for a join."""
+    return On(evaluation, *evaluations)
+
+
+def and_(evaluation: Expression, *evaluations: Expression | LogicGate) -> LogicGate:
+    """Build an "and" expression for a part of a query."""
+    return LogicGate(BooleanOperator.AND, evaluation, *evaluations)
+
+
+def and_not(evaluation: Expression, *evaluations: Expression | LogicGate) -> LogicGate:
+    """Build an "and not" expression for a part of a query."""
+    return LogicGate(BooleanOperator.AND_NOT, evaluation, *evaluations)
+
+
+def or_(evaluation: Expression, *evaluations: Expression | LogicGate) -> LogicGate:
+    """Build an "or" expression for a part of a query."""
+    return LogicGate(BooleanOperator.OR, evaluation, *evaluations)
+
+
+def or_not(evaluation: Expression, *evaluations: Expression | LogicGate) -> LogicGate:
+    """Build an "or not" expression for a part of a query."""
+    return LogicGate(BooleanOperator.OR_NOT, evaluation, *evaluations)
