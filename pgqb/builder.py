@@ -9,12 +9,18 @@ from __future__ import annotations
 
 import abc
 import enum
+import sys
 import typing
 from abc import ABC
-from typing import Any, Self, Type
+from typing import Any, Type
 
 from pgqb._snake import to_snake as snake
 from pgqb.types import PGEnum, SQLType
+
+if sys.version_info >= (3, 10):  # pragma: no cover
+    from typing import Self  # pragma: no cover
+else:
+    from typing_extensions import Self  # pragma: no cover
 
 
 class QueryBuilder(abc.ABC):
