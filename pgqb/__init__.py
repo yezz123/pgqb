@@ -1,4 +1,8 @@
+"""A simple SQL query builder for PostgreSQL."""
+
 from __future__ import annotations
+
+__version__ = "0.1.0"
 
 __all__ = (
     "As",
