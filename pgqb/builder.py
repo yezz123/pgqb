@@ -17,7 +17,7 @@ from typing import Any, Type
 from pgqb._snake import to_snake as snake
 from pgqb.types import PGEnum, SQLType
 
-if sys.version_info >= (3, 10):  # pragma: no cover
+if sys.version_info > (3, 10):  # pragma: no cover
     from typing import Self  # pragma: no cover
 else:
     from typing_extensions import Self  # pragma: no cover
