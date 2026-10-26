@@ -96,6 +96,7 @@ class User(Table):
     last = Column(TEXT())
     verified_at = Column(TIMESTAMP(with_time_zone=True))
 
+
 print(User.create_table())
 
 # CREATE TABLE IF NOT EXISTS "user" (
